@@ -14,7 +14,7 @@ A Hindi-language music learning platform built with **Next.js 13**, **TypeScript
 - TypeScript
 - Tailwind CSS
 
-- app demo:
+ ## app demo:
 - netlfiy: https://kanu-music-app.netlify.app/
 - vercel: https://music-mcsxssys3-kanu123progs-projects.vercel.app/
 
