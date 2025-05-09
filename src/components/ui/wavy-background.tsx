@@ -27,16 +27,22 @@ export const WavyBackground = ({
   [key: string]: any;
 }) => {
   const noise = createNoise3D();
-  let w: number,
-    h: number,
-    nt: number,
-    i: number,
-    x: number,
-    ctx: any,
-    canvas: any;
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationId = useRef<number | null>(null); // Ref to persist animationId between renders
 
-  // Memoize the init function to ensure stability
+  let w: number, h: number, nt: number, i: number, x: number, ctx: any, canvas: any;
+
+  const getSpeed = () => {
+    switch (speed) {
+      case "slow":
+        return 0.001;
+      case "fast":
+        return 0.002;
+      default:
+        return 0.001;
+    }
+  };
+
   const init = useCallback(() => {
     canvas = canvasRef.current;
     ctx = canvas.getContext("2d");
@@ -51,17 +57,6 @@ export const WavyBackground = ({
     };
     render();
   }, [blur]);
-
-  const getSpeed = () => {
-    switch (speed) {
-      case "slow":
-        return 0.001;
-      case "fast":
-        return 0.002;
-      default:
-        return 0.001;
-    }
-  };
 
   const waveColors = colors ?? [
     "#38bdf8",
@@ -86,21 +81,22 @@ export const WavyBackground = ({
     }
   };
 
-  let animationId: number;
   const render = () => {
     ctx.fillStyle = backgroundFill || "black";
     ctx.globalAlpha = waveOpacity || 0.5;
     ctx.fillRect(0, 0, w, h);
     drawWave(5);
-    animationId = requestAnimationFrame(render);
+    animationId.current = requestAnimationFrame(render);
   };
 
   useEffect(() => {
     init();
     return () => {
-      cancelAnimationFrame(animationId);
+      if (animationId.current) {
+        cancelAnimationFrame(animationId.current);
+      }
     };
-  }, [init, animationId]); // Add `init` to dependency array
+  }, [init]); // Only depend on 'init', which already has the correct dependencies
 
   return (
     <div
